@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NASA Capacitor Part Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 8px; }
+        th { background-color: #f0f0f0; }
+        a { color: blue; text-decoration: none; }
+        #loading { display: none; font-weight: bold; }
+    </style>
+    <script>
+        function showLoading() {
+            document.getElementById("loading").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <h2>NASA NEPP Capacitor Part Number Search</h2>
+    <form method="POST" onsubmit="showLoading()">
+        <input type="text" name="part_number" placeholder="Enter Part Number (e.g., CKR05)" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="loading">Searching all capacitor types... Please wait.</div>
+
+    {% if results %}
+    <h3>Results for: "{{ part_number }}"</h3>
+    <form method="POST" action="/download">
+        <input type="hidden" name="part_number" value="{{ part_number }}">
+        <button type="submit">Download Results as CSV</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Page URL</th>
+                <th>Matched Row</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for url, row in results %}
+            <tr>
+                <td><a href="{{ url }}" target="_blank">{{ url }}</a></td>
+                <td>{{ row | join(', ') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elif request.method == "POST" %}
+        <p>No results found for "{{ part_number }}".</p>
+    {% endif %}
+</body>
+</html>
